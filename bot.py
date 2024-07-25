@@ -2,11 +2,13 @@ import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, CallbackContext
 
-TOKEN = '7003240039:AAHSWiGvpPv47p5kPJXigGvJjV6gOpBJWRs'
-CHANNEL_ID = '-1002104343087'  # Используем числовой ID канала
+# Новый токен бота
+TOKEN = '7266577671:AAE9-rPYFHu9GX7lcgg27Cm0p_5DC6AB5sE'
+# Замените CHANNEL_ID на ваш новый канал, если требуется
+CHANNEL_ID = '-1002104343087'  # Пример ID канала
 
 # Включаем логирование
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelень)s - %(сообщение)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 bot = Bot(token=TOKEN)
@@ -19,7 +21,7 @@ async def start(update: Update, context: CallbackContext) -> None:
         [InlineKeyboardButton("О нас", callback_data='about')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text('Добро пожаловать! Выберите опцию:', reply_markup=reply_markup)
+    await update.message.reply_text('Добро пожаловать в CodeAdvance! Выберите опцию:', reply_markup=reply_markup)
 
 async def button(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
