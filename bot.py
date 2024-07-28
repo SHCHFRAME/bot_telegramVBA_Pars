@@ -1,6 +1,6 @@
 import logging
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, BotCommand, KeyboardButton, ReplyKeyboardMarkup
-from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, CallbackContext
+from telegram import Update, Bot, BotCommand, KeyboardButton, ReplyKeyboardMarkup
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 import asyncio
 import nest_asyncio
 
@@ -20,11 +20,11 @@ bot = Bot(token=TOKEN)
 # Функция для создания главного меню
 def main_menu_keyboard():
     keyboard = [
-        [KeyboardButton("Заказать услугу")],
-        [KeyboardButton("Способы оплаты")],
-        [KeyboardButton("О компании")],
-        [KeyboardButton("Контакты")],
-        [KeyboardButton("Отправить сообщение в канал")]
+        [KeyboardButton("🛠️ Заказать услугу")],
+        [KeyboardButton("💳 Способы оплаты")],
+        [KeyboardButton("🏢 О компании")],
+        [KeyboardButton("📞 Контакты")],
+        [KeyboardButton("📨 Отправить сообщение в канал")]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -32,7 +32,7 @@ def main_menu_keyboard():
 async def start(update: Update, context: CallbackContext) -> None:
     logger.debug("Получена команда /start")
     await update.message.reply_text(
-        'Добро пожаловать в CodeAdvance! Мы предлагаем профессиональные услуги по программированию и разработке сайтов. Выберите нужную опцию:',
+        '👋 Добро пожаловать в CodeAdvance! Мы предлагаем профессиональные услуги по программированию и разработке сайтов. Выберите нужную опцию:',
         reply_markup=main_menu_keyboard()
     )
 
@@ -41,42 +41,28 @@ async def handle_message(update: Update, context: CallbackContext) -> None:
     text = update.message.text
     logger.debug(f"Получено сообщение: {text}")
 
-    if text == 'Заказать услугу':
-        await update.message.reply_text("Для заказа услуги напишите нам в Telegram: @tolkovba", reply_markup=main_menu_keyboard())
-    elif text == 'Способы оплаты':
-        await update.message.reply_text("Мы принимаем оплату через криптокошелек USDT TRC20: TTMc4wp1LT4QddSRkojCNxXeL8Z5cPVLcY", reply_markup=main_menu_keyboard())
-    elif text == 'О компании':
-        await update.message.reply_text("CodeAdvance – ведущая компания в области VBA программирования и веб-разработки. Мы гарантируем высокое качество услуг и индивидуальный подход к каждому клиенту.", reply_markup=main_menu_keyboard())
-    elif text == 'Контакты':
-        await update.message.reply_text("Свяжитесь с нами: Email: support@codeadvance.com, Telegram: @tolkovba", reply_markup=main_menu_keyboard())
-    elif text == 'Отправить сообщение в канал':
+    if text == '🛠️ Заказать услугу':
+        await update.message.reply_text("📞 Для заказа услуги напишите нам в Telegram: @tolkovba", reply_markup=main_menu_keyboard())
+    elif text == '💳 Способы оплаты':
+        await update.message.reply_text("💰 Мы принимаем оплату через криптокошелек USDT TRC20: TTMc4wp1LT4QddSRkojCNxXeL8Z5cPVLcY", reply_markup=main_menu_keyboard())
+    elif text == '🏢 О компании':
+        await update.message.reply_text("🔍 CodeAdvance – ведущая компания в области VBA программирования и веб-разработки. Мы гарантируем высокое качество услуг и индивидуальный подход к каждому клиенту.", reply_markup=main_menu_keyboard())
+    elif text == '📞 Контакты':
+        await update.message.reply_text("📬 Свяжитесь с нами: Email: support@codeadvance.com, Telegram: @tolkovba", reply_markup=main_menu_keyboard())
+    elif text == '📨 Отправить сообщение в канал':
         await send_to_channel(update, context)
 
 # Обработчик команды send_to_channel
 async def send_to_channel(update: Update, context: CallbackContext) -> None:
     logger.debug("Обработка команды send_to_channel")
     try:
-        message = "Привет, канал!"
+        message = "Привет, канал! 👋"
         await bot.send_message(chat_id=CHANNEL_ID, text=message)
         logger.info("Сообщение отправлено в канал")
-        await update.message.reply_text("Сообщение успешно отправлено в канал", reply_markup=main_menu_keyboard())
+        await update.message.reply_text("✅ Сообщение успешно отправлено в канал", reply_markup=main_menu_keyboard())
     except Exception as e:
         logger.error(f"Ошибка при отправке сообщения в канал: {e}")
-        await update.message.reply_text(f"Ошибка: {e}", reply_markup=main_menu_keyboard())
-
-# Обработчик кнопок InlineKeyboard
-async def button(update: Update, context: CallbackContext) -> None:
-    query = update.callback_query
-    await query.answer()
-    choice = query.data
-    logger.debug(f"Нажата кнопка: {choice}")
-
-    if choice == 'order':
-        await query.edit_message_text(text="Вы можете написать нам: @tolkovba")
-    elif choice == 'payment':
-        await query.edit_message_text(text="Наш криптокошелек для USDT TRC20: TTMc4wp1LT4QddSRkojCNxXeL8Z5cPVLcY")
-    elif choice == 'about':
-        await query.edit_message_text(text="Мы предоставляем комплексные услуги, включая VBA программирование и разработку сайтов. Обращайтесь к нам для качественного выполнения всех задач!")
+        await update.message.reply_text(f"❌ Ошибка: {e}", reply_markup=main_menu_keyboard())
 
 # Функция для установки команд бота
 async def set_bot_commands(bot: Bot):
@@ -93,7 +79,6 @@ async def main() -> None:
     # Регистрация обработчиков команд и сообщений
     application.add_handler(CommandHandler('start', start))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    application.add_handler(CallbackQueryHandler(button))
 
     await set_bot_commands(application.bot)
 
