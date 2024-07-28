@@ -1,6 +1,11 @@
 import logging
-from telegram import Update, Bot, KeyboardButton, ReplyKeyboardMarkup
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, BotCommand, KeyboardButton, ReplyKeyboardMarkup
+from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, CallbackContext
+import asyncio
+import nest_asyncio
+
+# Настройка nest_asyncio
+nest_asyncio.apply()
 
 # Токен бота и ID канала
 TOKEN = '7266577671:AAE9-rPYFHu9GX7lcgg27Cm0p_5DC6AB5sE'
@@ -59,16 +64,41 @@ async def send_to_channel(update: Update, context: CallbackContext) -> None:
         logger.error(f"Ошибка при отправке сообщения в канал: {e}")
         await update.message.reply_text(f"Ошибка: {e}", reply_markup=main_menu_keyboard())
 
+# Обработчик кнопок InlineKeyboard
+async def button(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+    await query.answer()
+    choice = query.data
+    logger.debug(f"Нажата кнопка: {choice}")
+
+    if choice == 'order':
+        await query.edit_message_text(text="Вы можете написать нам: @tolkovba")
+    elif choice == 'payment':
+        await query.edit_message_text(text="Наш криптокошелек для USDT TRC20: TTMc4wp1LT4QddSRkojCNxXeL8Z5cPVLcY")
+    elif choice == 'about':
+        await query.edit_message_text(text="Мы предоставляем комплексные услуги, включая VBA программирование и разработку сайтов. Обращайтесь к нам для качественного выполнения всех задач!")
+
+# Функция для установки команд бота
+async def set_bot_commands(bot: Bot):
+    commands = [
+        BotCommand(command="start", description="Запуск бота"),
+        BotCommand(command="send_to_channel", description="Отправить сообщение в канал")
+    ]
+    await bot.set_my_commands(commands)
+
 # Главная функция
-def main() -> None:
+async def main() -> None:
     application = Application.builder().token(TOKEN).build()
-    
+
     # Регистрация обработчиков команд и сообщений
     application.add_handler(CommandHandler('start', start))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    application.add_handler(CallbackQueryHandler(button))
+
+    await set_bot_commands(application.bot)
 
     logger.info("Запуск бота...")
-    application.run_polling()
+    await application.run_polling()
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
